@@ -1,29 +1,39 @@
 <!DOCTYPE html>
 <html lang="pt-br">
-
 <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Dashboard</title>
-    <style>
-        body {
-            background-color: #f0f0f0;
-            font-family: 'Segoe UI', sans-serif;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            height: 100vh;
-        }
-        
-        h1 {
-            color: #2575fc;
-        }
-    </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - Icatalog</title>
+    <link rel="stylesheet" href="style.css" />
 </head>
-
 <body>
-    <h1>Bem-vindo ao Dashboard 2025 uhuuhu!</h1>
-    < h1>testes automatizados</h1>
-</body>
 
+    <header class="header">
+        <h1>Icatalog</h1>
+    </header>
+
+    <div class="main-container">
+        
+        <main class="catalog-container" id="catalog">
+            </main>
+
+        <aside class="cart-container">
+            <h2>Carrinho de Compras</h2>
+            <ul id="cart-items">
+                <p class="empty-cart-message">Seu carrinho está vazio.</p>
+            </ul>
+            <div class="cart-total">
+                <p>Total: <span id="cart-total-value">R$ 0,00</span></p>
+            </div>
+            <div class="cart-actions">
+                <button id="finalize-btn">Finalizar Compra</button>
+                <button id="clear-cart-btn">Limpar Carrinho</button>
+            </div>
+        </aside>
+
+    </div>
+
+    <script src="script.js"></script>
+
+</body>
 </html>

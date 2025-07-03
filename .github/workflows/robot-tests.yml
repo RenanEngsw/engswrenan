@@ -1,10 +1,10 @@
-name: Executar Testes Robot
+name: Executar Testes Robot Framework
 
 on:
   push:
-    branches: [main]
+    branches: [ main, develop ]
   pull_request:
-    branches: [main]
+    branches: [ main, develop ]
 
 jobs:
   robot-tests:
@@ -12,41 +12,37 @@ jobs:
 
     steps:
       - name: Checkout do código
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
-      - name: Configurar Python
-        uses: actions/setup-python@v4
+      - name: Configurar Python 3.10
+        uses: actions/setup-python@v5
         with:
-          python-version: "3.10"
+          python-version: '3.10'
+          cache: 'pip'
 
-      - name: Instalar dependências
-        run: |
-          python -m pip install --upgrade pip
-          pip install -r requirements.txt
+      - name: Instalar dependências do Python
+        run: pip install -r requirements.txt
+      
+      # REMOVEMOS O PASSO DE INSTALAÇÃO MANUAL DO NAVEGADOR E DRIVER
 
-      - name: Instalar navegador e driver
+      - name: Executar testes com servidor web
         run: |
-          sudo apt update
-          sudo apt install -y wget unzip xvfb libnss3
-          wget https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb
-          sudo dpkg -i google-chrome*.deb || sudo apt -f install -y
-          wget https://edgedl.me.gvt1.com/edgedl/chrome/chrome-for-testing/137.0.7151.55/linux64/chromedriver-linux64.zip
-          unzip chromedriver-linux64.zip
-          sudo mv chromedriver-linux64/chromedriver /usr/local/bin/
-          chmod +x /usr/local/bin/chromedriver
-
-      - name: Executar testes com Xvfb (modo headless)
-        run: |
-          Xvfb :99 & export DISPLAY=:99
+          # Inicia o servidor web em background
           python3 -m http.server 8000 &
-          sleep 2
-          robot --variable LOGIN_PAGE:http://localhost:8000/index.html tests
+          
+          # Espera um pouco para o servidor iniciar
+          sleep 3
+          
+          # Executa os testes. A SeleniumLibrary vai baixar o driver correto automaticamente.
+          # O alias 'headlesschrome' já configura o navegador para rodar em modo invisível.
+          robot --variable BROWSER:headlesschrome --outputdir tests/results tests/
 
-      - name: Salvar relatório
+      - name: Fazer upload dos relatórios de teste
+        if: always() # Sempre executa este passo, mesmo se os testes falharem
         uses: actions/upload-artifact@v4
         with:
-          name: robot-report
+          name: relatorios-robot
           path: |
-            log.html
-            report.html
-            output.xml
+            tests/results/log.html
+            tests/results/report.html
+            tests/results/output.xml

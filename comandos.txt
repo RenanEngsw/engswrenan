@@ -1,4 +1,3 @@
  python -m http.server 8000     iniciar server no terminal 1
 python -m robot .\tests\teste_simples_carrinho.robot    rodar o teste
-
-aa
+sadas

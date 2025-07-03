@@ -1,0 +1,356 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - Icatalog</title>
+    <style>
+        :root {
+            --primary-color: #007bff;
+            --secondary-color: #0056b3;
+            --light-gray: #f0f2f5;
+            --dark-gray: #333;
+            --medium-gray: #555;
+            --white: #fff;
+            --border-color: #ddd;
+        }
+
+        body { 
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+            background-color: var(--light-gray);
+            margin: 0;
+            padding: 0;
+        }
+
+        .header {
+            background-color: var(--white);
+            padding: 15px 30px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            text-align: center;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .header h1 {
+            margin: 0;
+            color: var(--primary-color);
+        }
+
+        .main-container {
+            display: flex;
+            padding: 20px;
+            gap: 20px;
+        }
+
+        /* Catálogo de Produtos */
+        .catalog-container {
+            flex-grow: 1;
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 20px;
+        }
+
+        .product-card {
+            background-color: var(--white);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+            display: flex;
+            flex-direction: column;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .product-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+
+        .product-card img {
+            width: 100%;
+            height: 180px;
+            object-fit: cover;
+        }
+
+        .product-info {
+            padding: 15px;
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .product-info h3 {
+            margin: 0 0 10px 0;
+            color: var(--dark-gray);
+        }
+
+        .product-info .price {
+            margin: auto 0 15px 0;
+            font-size: 1.2em;
+            font-weight: bold;
+            color: var(--primary-color);
+        }
+        
+        .add-to-cart-btn {
+            width: 100%;
+            padding: 10px;
+            border: none;
+            border-radius: 4px;
+            background-color: var(--primary-color);
+            color: var(--white);
+            font-size: 16px;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+        
+        .add-to-cart-btn:hover {
+            background-color: var(--secondary-color);
+        }
+
+        /* Carrinho de Compras */
+        .cart-container {
+            width: 350px;
+            flex-shrink: 0;
+            background-color: var(--white);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+            position: sticky;
+            top: 20px;
+            align-self: flex-start;
+        }
+        
+        .cart-container h2 {
+            margin-top: 0;
+            text-align: center;
+            color: var(--dark-gray);
+        }
+        
+        #cart-items {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+        
+        #cart-items li {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 0;
+            border-bottom: 1px solid #eee;
+            font-size: 0.9em;
+        }
+
+        #cart-items li:last-child {
+            border-bottom: none;
+        }
+
+        #cart-items .item-name {
+            flex-grow: 1;
+        }
+
+        #cart-items .item-qty {
+            margin: 0 10px;
+            font-weight: bold;
+        }
+        
+        .empty-cart-message {
+            text-align: center;
+            color: var(--medium-gray);
+            padding: 40px 0;
+        }
+
+        .cart-total {
+            margin-top: 20px;
+            padding-top: 15px;
+            border-top: 2px solid var(--dark-gray);
+            text-align: right;
+            font-size: 1.3em;
+            font-weight: bold;
+        }
+
+        .cart-actions {
+            margin-top: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .cart-actions button {
+            padding: 12px;
+            border: none;
+            border-radius: 4px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+
+        #finalize-btn {
+            background-color: #28a745;
+            color: var(--white);
+        }
+        #finalize-btn:hover {
+            background-color: #218838;
+        }
+
+        #clear-cart-btn {
+            background-color: #dc3545;
+            color: var(--white);
+        }
+        #clear-cart-btn:hover {
+            background-color: #c82333;
+        }
+
+    </style>
+</head>
+<body>
+
+    <header class="header">
+        <h1>Icatalog</h1>
+    </header>
+
+    <div class="main-container">
+        
+        <main class="catalog-container" id="catalog">
+            </main>
+
+        <aside class="cart-container">
+            <h2>Carrinho de Compras</h2>
+            <ul id="cart-items">
+                <p class="empty-cart-message">Seu carrinho está vazio.</p>
+            </ul>
+            <div class="cart-total">
+                <p>Total: <span id="cart-total-value">R$ 0,00</span></p>
+            </div>
+            <div class="cart-actions">
+                <button id="finalize-btn">Finalizar Compra</button>
+                <button id="clear-cart-btn">Limpar Carrinho</button>
+            </div>
+        </aside>
+
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // --- DADOS FICTÍCIOS DOS PRODUTOS ---
+            const products = [
+                { id: 1, name: 'Notebook Legacy', price: 2599.00, image: 'https://via.placeholder.com/300x200.png?text=Notebook' },
+                { id: 2, name: 'Smartphone Pro X', price: 1899.90, image: 'https://via.placeholder.com/300x200.png?text=Smartphone' },
+                { id: 3, name: 'Smartwatch Active', price: 749.50, image: 'https://via.placeholder.com/300x200.png?text=Smartwatch' },
+                { id: 4, name: 'Fone Bluetooth Air', price: 399.00, image: 'https://via.placeholder.com/300x200.png?text=Fone+Bluetooth' },
+                { id: 5, name: 'Tablet Screen+', price: 1250.00, image: 'https://via.placeholder.com/300x200.png?text=Tablet' },
+                { id: 6, name: 'Câmera DSLR 4K', price: 3200.00, image: 'https://via.placeholder.com/300x200.png?text=Câmera+DSLR' },
+            ];
+
+            // --- ESTADO DO CARRINHO ---
+            let cart = [];
+
+            // --- ELEMENTOS DO DOM ---
+            const catalogContainer = document.getElementById('catalog');
+            const cartItemsContainer = document.getElementById('cart-items');
+            const cartTotalValue = document.getElementById('cart-total-value');
+            const clearCartBtn = document.getElementById('clear-cart-btn');
+            const finalizeBtn = document.getElementById('finalize-btn');
+
+            // --- FUNÇÕES ---
+
+            /** Formata um número para o padrão de moeda brasileiro (BRL) */
+            function formatCurrency(value) {
+                return value.toLocaleString('pt-br', { style: 'currency', currency: 'BRL' });
+            }
+
+            /** Renderiza os produtos no catálogo */
+            function renderProducts() {
+                products.forEach(product => {
+                    const card = document.createElement('div');
+                    card.className = 'product-card';
+                    card.innerHTML = `
+                        <img src="${product.image}" alt="${product.name}">
+                        <div class="product-info">
+                            <h3>${product.name}</h3>
+                            <p class="price">${formatCurrency(product.price)}</p>
+                            <button class="add-to-cart-btn" data-id="${product.id}">Adicionar ao Carrinho</button>
+                        </div>
+                    `;
+                    catalogContainer.appendChild(card);
+                });
+            }
+
+            /** Atualiza a interface do carrinho (UI) */
+            function updateCartUI() {
+                cartItemsContainer.innerHTML = ''; // Limpa o carrinho antes de atualizar
+
+                if (cart.length === 0) {
+                    cartItemsContainer.innerHTML = '<p class="empty-cart-message">Seu carrinho está vazio.</p>';
+                } else {
+                    cart.forEach(item => {
+                        const li = document.createElement('li');
+                        li.innerHTML = `
+                            <span class="item-name">${item.name}</span>
+                            <span class="item-qty">x${item.quantity}</span>
+                            <span class="item-price">${formatCurrency(item.price * item.quantity)}</span>
+                        `;
+                        cartItemsContainer.appendChild(li);
+                    });
+                }
+                
+                const total = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+                cartTotalValue.textContent = formatCurrency(total);
+            }
+
+            /** Adiciona um item ao carrinho */
+            function addToCart(productId) {
+                const product = products.find(p => p.id === productId);
+                const cartItem = cart.find(item => item.id === productId);
+
+                if (cartItem) {
+                    // Se o item já existe, incrementa a quantidade
+                    cartItem.quantity++;
+                } else {
+                    // Se não existe, adiciona ao carrinho
+                    cart.push({ id: product.id, name: product.name, price: product.price, quantity: 1 });
+                }
+
+                updateCartUI();
+            }
+            
+            /** Limpa todos os itens do carrinho */
+            function clearCart() {
+                cart = [];
+                updateCartUI();
+            }
+            
+            /** Finaliza a compra */
+            function finalizePurchase() {
+                if(cart.length === 0) {
+                    alert('Seu carrinho está vazio!');
+                    return;
+                }
+                const totalValue = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+                alert(`Compra finalizada com sucesso! \n\nTotal: ${formatCurrency(totalValue)}`);
+                clearCart();
+            }
+
+            // --- EVENT LISTENERS ---
+
+            // Delegação de evento para os botões "Adicionar ao Carrinho"
+            catalogContainer.addEventListener('click', function(event) {
+                if (event.target.classList.contains('add-to-cart-btn')) {
+                    const productId = parseInt(event.target.getAttribute('data-id'));
+                    addToCart(productId);
+                }
+            });
+            
+            clearCartBtn.addEventListener('click', clearCart);
+            finalizeBtn.addEventListener('click', finalizePurchase);
+
+            // --- INICIALIZAÇÃO ---
+            renderProducts();
+            updateCartUI();
+        });
+    </script>
+
+</body>
+</html>
